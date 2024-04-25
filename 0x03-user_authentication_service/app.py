@@ -105,6 +105,30 @@ def reset_password():
     return jsonify({"email": email, "reset_token": reset_token}), 200
 
 
+@app.route("/reset_password", methods=["PUT"], strict_slashes=False)
+def update_password():
+    """
+    Handle PUT requests to /reset_password to update user password.
+
+    Expects form data with fields: "email", "reset_token", and "new_password".
+
+    Returns:
+        Response: A JSON response indicating success or failure.
+    """
+    # Extract email, reset token, and new password from form data
+    email = request.form.get("email")
+    reset_token = request.form.get("reset_token")
+    new_password = request.form.get("new_password")
+    try:
+        # Update the user's password
+        AUTH.update_password(email, reset_token, new_password)
+        # Return success response
+        return jsonify({"email": email, "message": "Password updated"}), 200
+    except ValueError:
+        # Return a 403 Forbidden error if the reset token is invalid
+        abort(403)
+
+
 if __name__ == "__main__":
     # Start Flask application on port 5000
     app.run(host="0.0.0.0", port=5000)
